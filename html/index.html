@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tombola Ticket</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+    }
+    h1 {
+      text-align: center;
+      margin: 10px 0;
+    }
+    h3 {
+      text-align: center;
+      margin: 5px 0;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 1200px;
+    }
+    .input-group, .buttons, .info {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin: 10px 0;
+    }
+    .info > div {
+      flex: 1;
+      max-width: 400px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #f8f8f8;
+      overflow-y: auto;
+      height: 200px;
+    }
+    .input-group input {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+    }
+    .input-group button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-left: 10px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .input-group button:hover {
+      background-color: #45a049;
+    }
+    .buttons button {
+      padding: 10px;
+      margin: 5px;
+      font-size: 14px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .buttons button:disabled {
+      background-color: #ddd;
+      color: #aaa;
+      cursor: not-allowed;
+    }
+    .buttons button:hover:not(:disabled) {
+      background-color: #45a049;
+    }
+    table {
+      border-collapse: collapse;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    td {
+      width: 40px;
+      height: 40px;
+      border: 1px solid #000;
+      text-align: center;
+      vertical-align: middle;
+      cursor: pointer;
+    }
+    .empty {
+      background-color: #f0f0f0;
+      cursor: default;
+    }
+    .marked {
+      background-color: #ffd700;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tombola</h1>
+  <h3>Click on block to mark and double click to unmark block</h3>
+  <div class="container">
+    <div class="input-group">
+      <input type="text" id="username" placeholder="Enter your username">
+      <button id="joinGame">Join Game</button>
+    </div>
+    <div id="ticket"></div>
+    <div class="buttons">
+      <button id="claimFirstRow" disabled>Claim First Row</button>
+      <button id="claimSecondRow" disabled>Claim Second Row</button>
+      <button id="claimThirdRow" disabled>Claim Third Row</button>
+      <button id="claimFirstFive" disabled>Claim First Five</button>
+      <button id="claimFullHouse" disabled>Claim Full House</button>
+      <button id="startGame">Start Game</button>
+      <button id="drawNumber">Draw Number</button>
+    </div>
+    <div class="info">
+      <div id="drawnNumbers">
+        <h3>Drawn Number:</h3>
+         
+      </div>
+      <div id="joinedUsers">
+        <h3>User Activities:</h3>
+      </div>
+      <div id="playerList">
+        <h3> Users: </h3>
+      </div>
+    </div>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const socket = io('http://localhost:3000');
+  
+      socket.on('connect', () => {
+        console.log('Connected to server');
+      });
+  
+      socket.on('ticketGenerated', (ticket) => {
+        console.log('Generated Ticket:', ticket);
+        displayTicket(ticket);
+        enableClaimButtons();
+      });
+  
+      socket.on('userJoined', (username) => {
+        const joinedUsers = document.getElementById('joinedUsers');
+        joinedUsers.innerHTML += `<p>${username} has joined the game</p>`;
+        const playerList = document.getElementById('playerList');
+        playerList.innerHTML += `<p>${username}</p>`;
+      });
+  
+      socket.on('userLeft', (username) => {
+        const joinedUsers = document.getElementById('joinedUsers');
+        joinedUsers.innerHTML += `<p>${username} has left the game</p>`;
+      });
+  
+      socket.on('joinedUsers', (users) => {
+        const joinedUsers = document.getElementById('joinedUsers');
+        users.forEach(username => {
+          joinedUsers.innerHTML += `<p>${username}</p>`;
+          const playerList = document.getElementById('playerList');
+          playerList.innerHTML += `<p>${username}</p>`;
+        });
+      });
+  
+      socket.on('winnerAnnounced', ({ username, claimType }) => {
+        alert(`Winner announced! ${username} claimed ${claimType}`);
+        const winners = document.getElementById('winners');
+        winners.innerHTML += `<p>${username} claimed ${claimType}</p>`;
+      });
+  
+      socket.on('numberDrawn', (num) => {
+        console.log('Number drawn:', num);
+        announceNumber(num);
+        displayDrawnNumber(num);
+      });
+  
+      socket.on('gameStarted', () => {
+        document.getElementById('drawnNumbers').innerText = '';
+      });
+  
+      document.getElementById('joinGame').addEventListener('click', () => {
+        const username = document.getElementById('username').value;
+        if (username) {
+          socket.emit('enterUsername', username);
+          document.getElementById('username').disabled = true;
+          document.getElementById('joinGame').disabled = true;
+        } else {
+          alert('Please enter a username');
+        }
+      });
+  
+      const claimButtons = ['FirstRow', 'SecondRow', 'ThirdRow', 'FirstFive', 'FullHouse'];
+      claimButtons.forEach(claimType => {
+        document.getElementById(`claim${claimType}`).addEventListener('click', () => {
+          const username = document.getElementById('username').value;
+          socket.emit('claimTicket', { username, claimType: claimType.toLowerCase() });
+        });
+      });
+  
+      document.getElementById('startGame').addEventListener('click', () => {
+        fetch('/game/start', { method: 'POST' });
+      });
+  
+      document.getElementById('drawNumber').addEventListener('click', () => {
+        fetch('/game/draw', { method: 'POST' });
+      });
+  
+      function displayTicket(ticket) {
+        const table = document.createElement('table');
+        ticket.forEach(row => {
+          const tr = document.createElement('tr');
+          row.forEach(num => {
+            const td = document.createElement('td');
+            if (num === '_') {
+              td.classList.add('empty');
+              td.innerText = ' ';
+            } else {
+              td.innerText = num;
+              td.addEventListener('click', () => markCell(td));
+              td.addEventListener('dblclick', () => unmarkCell(td));
+            }
+            tr.appendChild(td);
+          });
+          table.appendChild(tr);
+        });
+        document.getElementById('ticket').innerHTML = '';
+        document.getElementById('ticket').appendChild(table);
+      }
+  
+      function markCell(cell) {
+        cell.classList.add('marked');
+      }
+  
+      function unmarkCell(cell) {
+        cell.classList.remove('marked');
+      }
+  
+      function enableClaimButtons() {
+        claimButtons.forEach(claimType => {
+          document.getElementById(`claim${claimType}`).disabled = false;
+        });
+      }
+  
+      function announceNumber(num) {
+        const msg = new SpeechSynthesisUtterance('Number ' + num);
+        window.speechSynthesis.speak(msg);
+      }
+  
+      function displayDrawnNumber(num) {
+        const drawnNumbersDiv = document.getElementById('drawnNumbers');
+        const span = document.createElement('span');
+        span.innerText = num + ' ';
+        span.style.fontWeight = 'bold';
+        drawnNumbersDiv.appendChild(span);
+      }
+    });
+  </script>
+  
+</body>
+</html>
