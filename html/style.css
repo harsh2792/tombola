@@ -1,0 +1,140 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+}
+
+h1 {
+    text-align: center;
+    margin: 10px 0;
+}
+
+h3 {
+    text-align: center;
+    margin: 5px 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.input-group,
+.buttons,
+.info {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+.info>div {
+    flex: 1;
+    max-width: 400px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+    overflow-y: auto;
+    height: 200px;
+}
+
+.input-group input {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+}
+
+.input-group button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin-left: 10px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.input-group button:hover {
+    background-color: #45a049;
+}
+
+.buttons button {
+    padding: 10px;
+    margin: 5px;
+    font-size: 14px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.buttons button:disabled {
+    background-color: #ddd;
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+.buttons button:hover:not(:disabled) {
+    background-color: #45a049;
+}
+
+table {
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+td {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #000;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.empty {
+    background-color: #f0f0f0;
+    cursor: default;
+}
+
+.marked {
+    background-color: #ffd700;
+}
+
+.rules {
+    width: 80%;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+}
+
+.rules h3 {
+    margin: 10px 0;
+    color: #333;
+}
+
+.rules ul {
+    padding-left: 20px;
+}
+
+.rules ul li {
+    margin: 5px 0;
+}
