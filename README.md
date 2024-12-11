@@ -19,12 +19,12 @@ Tombola is a fun and interactive game where players generate tickets, draw numbe
 ## Setup
 
 1. **Clone the repository**
-   ```sh
-   git clone https://github.com/harsh2792/tombola.git
-   cd tombola
-   ```
+```sh
+git clone https://github.com/harsh2792/tombola.git
+cd tombola
+```
 
 2. **Install Depedencies**
-   ```sh
+```sh
   npm install
-   ```
+```
