@@ -105,11 +105,29 @@
     .marked {
       background-color: #ffd700;
     }
+    .rules {
+      width: 80%;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #f8f8f8;
+    }
+    .rules h3 {
+      margin: 10px 0;
+      color: #333;
+    }
+    .rules ul {
+      padding-left: 20px;
+    }
+    .rules ul li {
+      margin: 5px 0;
+    }
   </style>
 </head>
 <body>
   <h1>Tombola</h1>
-  <h3>Click on block to mark and double click to unmark block</h3>
   <div class="container">
     <div class="input-group">
       <input type="text" id="username" placeholder="Enter your username">
@@ -126,23 +144,45 @@
       <button id="drawNumber">Draw Number</button>
     </div>
     <div class="info">
-      <div id="drawnNumbers">
-        <h3>Drawn Number:</h3>
-         
+      <div>
+        <span>Drawn Numbers:</span>
+        <div id="drawnNumbers"></div>
       </div>
-      <div id="joinedUsers">
-        <h3>User Activities:</h3>
+      <div >
+        <span>Players</span>
+        <div id="playerList"></div>
       </div>
-      <div id="playerList">
-        <h3> Users: </h3>
+      <div>
+        <span>Winners</span>
+        <div id="winners"></div>
       </div>
+    </div>
+    <div class="rules">
+      <h3>Game Rules:</h3>
+      <ul>
+        <li><strong>Join Game:</strong> Enter your username and click "Join Game" to participate.</li>
+        <li><strong>Generate Ticket:</strong> Once you join, a ticket will be generated for you.</li>
+        <li><strong>Mark/Unmark Numbers:</strong> Click on a number to mark it, double click to unmark.</li>
+        <li><strong>Start Game:</strong> Only the game host can start the game by clicking "Start Game".</li>
+        <li><strong>Draw Number:</strong> Click "Draw Number" to draw the next number.</li>
+        <li><strong>Claims:</strong>
+          <ul>
+            <li><strong>First Row:</strong> Mark all numbers in the first row.</li>
+            <li><strong>Second Row:</strong> Mark all numbers in the second row.</li>
+            <li><strong>Third Row:</strong> Mark all numbers in the third row.</li>
+            <li><strong>First Five:</strong> Mark the first five numbers on your ticket.</li>
+            <li><strong>Full House:</strong> Mark all numbers on your ticket.</li>
+          </ul>
+        </li>
+        <li><strong>Win:</strong> A winner is announced when a valid claim is made.</li>
+      </ul>
     </div>
   </div>
   <script src="/socket.io/socket.io.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const socket = io('http://localhost:3000');
-  
+      let players = [];
       socket.on('connect', () => {
         console.log('Connected to server');
       });
@@ -151,26 +191,32 @@
         console.log('Generated Ticket:', ticket);
         displayTicket(ticket);
         enableClaimButtons();
+        // document.getElementById('drawnNumbers').innerText = '';
       });
   
       socket.on('userJoined', (username) => {
-        const joinedUsers = document.getElementById('joinedUsers');
-        joinedUsers.innerHTML += `<p>${username} has joined the game</p>`;
+        players.push(username);
         const playerList = document.getElementById('playerList');
-        playerList.innerHTML += `<p>${username}</p>`;
+        playerList.innerHTML = '';
+        players.forEach(player => {
+          playerList.innerHTML += `<p>${player}</p>`;
+        });
       });
   
       socket.on('userLeft', (username) => {
-        const joinedUsers = document.getElementById('joinedUsers');
-        joinedUsers.innerHTML += `<p>${username} has left the game</p>`;
+        players.splice(players.indexOf(username), 1);
+        const playerList = document.getElementById('playerList');
+        playerList.innerHTML = '';
+        players.forEach(player => {
+          playerList.innerHTML += `<p>${player}</p>`;
+        });
       });
   
       socket.on('joinedUsers', (users) => {
-        const joinedUsers = document.getElementById('joinedUsers');
+        const joinedUsers = document.getElementById('playerList');
+        players = users;
         users.forEach(username => {
           joinedUsers.innerHTML += `<p>${username}</p>`;
-          const playerList = document.getElementById('playerList');
-          playerList.innerHTML += `<p>${username}</p>`;
         });
       });
   
@@ -189,6 +235,11 @@
       socket.on('gameStarted', () => {
         document.getElementById('drawnNumbers').innerText = '';
       });
+
+      socket.on('socketErr', (data) => {
+        console.log("error", data);
+        alert(data.message);
+      });
   
       document.getElementById('joinGame').addEventListener('click', () => {
         const username = document.getElementById('username').value;
@@ -204,8 +255,10 @@
       const claimButtons = ['FirstRow', 'SecondRow', 'ThirdRow', 'FirstFive', 'FullHouse'];
       claimButtons.forEach(claimType => {
         document.getElementById(`claim${claimType}`).addEventListener('click', () => {
+          console.log("in....claim");
+          
           const username = document.getElementById('username').value;
-          socket.emit('claimTicket', { username, claimType: claimType.toLowerCase() });
+          socket.emit('claimTicket', { username, claimType: claimType });
         });
       });
   
@@ -267,6 +320,5 @@
       }
     });
   </script>
-  
 </body>
 </html>
