@@ -28,3 +28,8 @@ cd tombola
 ```sh
   npm install
 ```
+
+2. **Run Project**
+```sh
+  npm run start
+```
