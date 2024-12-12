@@ -39,6 +39,12 @@ This project uses Jest for testing. You can run unit tests, integration tests, a
 - To generate a code coverage report: `npm run test:coverage`
 - The coverage report will be generated in the `coverage` directory.
 
+img
+
+![Coverage report](images/code-coverage.jpeg "Coverage report image")
+
+
+
 ## Project Structure
 ```
 .
