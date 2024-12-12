@@ -1,7 +1,7 @@
-# Ticket Service Application
+# Tombola
 
 ## Overview
-This project implements a Ticket Service using NestJS. The service generates bingo tickets, verifies ticket claims, and manages a real-time game through WebSockets.
+This project implements a Tombola using NestJS. The service generates bingo tickets, verifies ticket claims, and manages a real-time game through WebSockets.
 
 ## Features
 - **Ticket Generation**: Generates a 3x9 bingo ticket with specific constraints.
@@ -17,8 +17,8 @@ Follow these steps to set up and run the application.
 
 ### Installation
 1. Clone the repository:
-   - `git clone https://github.com/your-repo/ticket-service.git`
-   - `cd ticket-service`
+   - `git clone https://github.com/harsh2792/tombola.git`
+   - `cd tombola`
 2. Install dependencies:
    - `npm install`
 
