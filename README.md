@@ -25,7 +25,11 @@ Follow these steps to set up and run the application.
 ### Running the Application
 1. Start the application:
    - `npm run start`
-2. The application will be available at `http://localhost:3000`.
+2. The application will be available at `http://localhost:3000/html`.
+
+
+![Tombola](images/Tombola-UI.png "Tombola UI")
+
 
 ## Testing
 This project uses Jest for testing. You can run unit tests, integration tests, and generate a code coverage report.
@@ -38,8 +42,6 @@ This project uses Jest for testing. You can run unit tests, integration tests, a
 ### Generating Code Coverage Report
 - To generate a code coverage report: `npm run test:coverage`
 - The coverage report will be generated in the `coverage` directory.
-
-img
 
 ![Coverage report](images/code-coverage.jpeg "Coverage report image")
 
