@@ -16,34 +16,50 @@ export class TicketService implements ITicketService {
      * @returns {Ticket} The generated ticket
      */
     generateTicket(username: string): Ticket {
-        const ticket: Ticket = Array.from({ length: 3 }, () => Array(9).fill('_') as TicketRow);
         const columns = [
             [1, 10], [11, 20], [21, 30], [31, 40], [41, 50], [51, 60], [61, 70], [71, 80], [81, 90]
         ];
         const numberDistribution: { [key: number]: number } = {};
         const numSet = new Set<number>();
+        const ticket: Ticket = Array.from({ length: 3 }, () => Array(9).fill('_') as TicketRow);
 
         // Ensure each column has no more than 3 numbers
         for (let row = 0; row < 3; row++) {
             let count = 0;
+
+            // Each row must have 5 numbers
             while (count < 5) {
                 const colIndex = this.getRandomInt(0, 8);
                 const [min, max] = columns[colIndex];
-                let num: number;
-                // do {
-                    num = this.getRandomInt(min, max);
-                    // console.log(attempts);
-                // } while ( numSet.has(num) || (numberDistribution[Math.floor((num - 1) / 10)] ?? 0) >= 3);
-                numSet.add(num);
-                if (ticket[row][colIndex] === '_' && (numberDistribution[Math.floor((num - 1) / 10)] ?? 0) < 3) {
+                let num = this.getRandomInt(min, max);
+
+                // Check value distribution and duplicate entries
+                if (ticket[row][colIndex] === '_' && (numberDistribution[Math.floor((num - 1) / 10)] ?? 0) < 3 && !numSet.has(num)) {
                     ticket[row][colIndex] = num;
                     numberDistribution[Math.floor((num - 1) / 10)] = (numberDistribution[Math.floor((num - 1) / 10)] ?? 0) + 1;
+                    numSet.add(num);
                     count++;
                 }
             }
         }
-
+        
         // Sort columns individually
+        this.tickets[username] = this.sortColumns(ticket);;
+        return ticket;
+    }
+
+    /**
+     * Sorts each column of the ticket individually in ascending order.
+     * 
+     * This function iterates over each column of the ticket and sorts the
+     * non-placeholder ('_') numbers within that column. The sorted numbers
+     * are then placed back into their respective positions in the column,
+     * preserving the structure of the ticket.
+     * 
+     * @param {Ticket} ticket - The ticket whose columns are to be sorted.
+     * @returns {Ticket} - The ticket with sorted columns.
+     */
+    private sortColumns(ticket: Ticket) {
         for (let col = 0; col < 9; col++) {
             const columnValues = ticket.map(row => row[col]).filter(num => num !== '_');
             columnValues.sort((a, b) => a - b);
@@ -54,8 +70,6 @@ export class TicketService implements ITicketService {
                 }
             }
         }
-
-        this.tickets[username] = ticket;
         return ticket;
     }
 

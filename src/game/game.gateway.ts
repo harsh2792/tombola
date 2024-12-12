@@ -42,7 +42,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!ticket) {
       return;
     } else if (this.winners[data.claimType]) {
-      client.to(client.id).emit('socketErr', { 
+      client.emit('socketErr', { 
         message: `${data.claimType} has already been claimed by ${this.winners[data.claimType]}`
       });
       return;
@@ -52,7 +52,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.winners[data.claimType] = data.username;
       this.server.emit('winnerAnnounced', { username: data.username, claimType: data.claimType });
     } else {
-      this.server.to(client.id).emit('socketErr', { message: `${data.claimType.toString()} is not valid` });
+      client.emit('socketErr', { message: `${data.claimType} is not valid` });
     }
   }
 

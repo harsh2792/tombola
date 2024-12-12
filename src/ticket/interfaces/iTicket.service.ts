@@ -2,11 +2,11 @@ export type TicketCell = number | '_';
 export type TicketRow = TicketCell[];
 export type Ticket = TicketRow[];
 export enum TicketClaimType { 
-  FirstRow,
-  SecondRow,
-  ThirdRow,
-  EarlyFive,
-  FullHouse 
+  FirstRow = 'FirstRow',
+  SecondRow = 'SecondRow',
+  ThirdRow = 'ThirdRow',
+  EarlyFive = 'EarlyFive',
+  FullHouse = 'FullHouse'
 }
 
 export interface ITicketService {
